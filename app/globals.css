@@ -4,47 +4,61 @@
 
 @layer base {
   body {
-    @apply bg-[#0D0814] text-slate-100 font-sans antialiased overflow-hidden selection:bg-pink-500 selection:text-white;
+    @apply bg-[#050308] text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-[#D89079] selection:text-black;
   }
 }
 
-/* Custom scrollbar for cyberpunk/cerebro dark theme */
+/* Celestial background layers */
+.celestial-stars-bg {
+  background-color: #050308;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, #FFF8F0, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 150px 80px, #ECC09B, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 300px 220px, #FFF, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 450px 140px, #FCE6D2, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 600px 350px, #D89079, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 750px 180px, #FFF, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 900px 280px, #ECC09B, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 1100px 100px, #FCE6D2, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 1200px 600px;
+}
+
+/* Glassmorphism card with rose-gold metallic border */
+.celestial-card {
+  background: linear-gradient(135deg, rgba(24, 14, 38, 0.75) 0%, rgba(11, 6, 18, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(236, 178, 146, 0.22);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8), 0 0 25px -8px rgba(236, 178, 146, 0.15);
+}
+
+.celestial-card:hover {
+  border-color: rgba(247, 197, 159, 0.5);
+  box-shadow: 0 15px 50px -10px rgba(0, 0, 0, 0.9), 0 0 35px -5px rgba(236, 178, 146, 0.3);
+}
+
+.celestial-gold-gradient {
+  background: linear-gradient(135deg, #FCE6D2 0%, #ECC09B 45%, #D89079 100%);
+}
+
+.celestial-gold-text {
+  background: linear-gradient(135deg, #FFF0E2 0%, #ECC09B 50%, #D89079 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #110B1C;
+  background: #08040C;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #362657;
+  background: rgba(236, 178, 146, 0.3);
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #5E3E9C;
-}
-
-/* Glow effects */
-.cerebro-gradient-banner {
-  background: linear-gradient(135deg, #441A3D 0%, #281236 40%, #170F2B 100%);
-  border: 1px solid rgba(229, 62, 123, 0.25);
-}
-
-.cerebro-card {
-  background: #181126;
-  border: 1px solid #2B1D45;
-  transition: all 0.25s ease;
-}
-
-.cerebro-card:hover {
-  border-color: #55338E;
-  transform: translateY(-2px);
-}
-
-.cerebro-pill-active {
-  background: linear-gradient(135deg, #FF4B72 0%, #9B51E0 100%);
-  box-shadow: 0 0 15px rgba(255, 75, 114, 0.4);
+  background: rgba(236, 178, 146, 0.6);
 }
