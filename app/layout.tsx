@@ -2,15 +2,15 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CEREBRO — Adaptive AI Quest & Study Studio',
+  title: 'VibeLearn NextGen — Cognitive Quest Studio',
   description:
-    'Cyber-themed adaptive learning platform powered by Ollama with live Learning Fingerprint, Experiment Mode and Low-Connectivity sync.',
+    'An adaptive engagement studio powered by local Ollama with live telemetry fingerprinting and experiment mode.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-[#0D0814] text-slate-100 font-sans antialiased h-screen overflow-hidden">
+      <body className="bg-[#0F081D] text-slate-100 font-sans antialiased h-screen overflow-hidden">
         {children}
       </body>
     </html>
