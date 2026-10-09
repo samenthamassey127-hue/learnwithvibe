@@ -26,23 +26,21 @@ export type LearningStyle = 'Examples' | 'Stories' | 'Steps' | 'Quizzes' | 'Visu
 
 export type ActivityType = 'Game' | 'Visual' | 'Challenge' | 'Text' | 'Experiment' | 'Quiz';
 
-// --- Learning Fingerprint ---
 export interface ActivityEngagement {
   type: ActivityType;
-  engagementDelta: number; // positive = helpful, negative = not
+  engagementDelta: number;
   timestamp: number;
 }
 
 export interface LearningFingerprint {
-  bestActivities: ActivityType[];         // ranked by avg engagement
-  preferredSessionMinutes: number;        // 5 | 10 | 15 | 20
+  bestActivities: ActivityType[];
+  preferredSessionMinutes: number;
   difficultyTrajectory: 'Easy→Medium' | 'Medium→Hard' | 'Hard' | 'Easy';
-  bestRecoveryStrategy: string;           // e.g. "Real-world problems"
+  bestRecoveryStrategy: string;
   engagementHistory: ActivityEngagement[];
   lastUpdated: number;
 }
 
-// --- Experiment Mode ---
 export type ExperimentStatus = 'idle' | 'predicting' | 'running' | 'revealed';
 
 export interface ExperimentOption {
@@ -63,39 +61,26 @@ export interface ExperimentBlock {
   selectedAnswer?: string;
 }
 
-// --- Offline / Sync ---
-export interface OfflineActivity {
-  id: string;
-  type: 'quiz' | 'experiment' | 'lesson';
-  title: string;
-  content: string;
-  completed: boolean;
-  completedAt?: number;
-  synced: boolean;
-}
-
-export interface SyncState {
-  isOnline: boolean;
-  pendingSync: number;
-  lastSyncedAt?: number;
-}
-
-// --- Student Profile ---
 export interface StudentProfile {
-  name?: string;
+  name: string;
   grade: GradeLevel;
   group: TrackGroup;
   courses: Course[];
   mood: Mood;
   learningStyle: LearningStyle;
+  streakDays: number;
+  questsCompleted: number;
+  successRate: number;
 }
 
-export interface Message {
+export interface Quest {
   id: string;
-  sender: 'user' | 'assistant';
-  text: string;
-  timestamp: number;
-  experiment?: ExperimentBlock;
+  title: string;
+  category: string;
+  subject: Course;
+  difficulty: 'Beginner' | 'Intermediate' | 'Mastery';
+  icon: string;
+  description: string;
+  promptSeed: string;
+  sampleCode?: string;
 }
-
-export type QuickReplyType = 'Yes' | 'Kind of' | 'No';
