@@ -1,20 +1,32 @@
-import { StudentProfile } from './types';
-import type { LearningFingerprint } from './types';
+import { StudentProfile, LearningFingerprint, ActivityType, ActivityEngagement } from './types';
 
 export const DEFAULT_PROFILE: StudentProfile = {
-  name: 'Alex',
-  grade: 8,
-  group: 'Science',
-  courses: ['Math', 'Science', 'Computer Science'],
+  name: 'Ayo',
+  grade: 9,
+  group: 'STEM',
+  courses: ['Computer Science', 'Physics', 'Math'],
   mood: 'Curious',
-  learningStyle: 'Examples',
+  learningStyle: 'Visuals',
+  streakDays: 6,
+  questsCompleted: 14,
+  successRate: 92,
 };
 
-const PROFILE_KEY = 'vibelearn_student_profile';
-const FINGERPRINT_KEY = 'vibelearn_fingerprint';
-const OFFLINE_QUEUE_KEY = 'vibelearn_offline_queue';
+export const DEFAULT_FINGERPRINT: LearningFingerprint = {
+  bestActivities: ['Challenge', 'Visual', 'Experiment'],
+  preferredSessionMinutes: 12,
+  difficultyTrajectory: 'Medium→Hard',
+  bestRecoveryStrategy: 'Real-world experiments',
+  engagementHistory: [
+    { type: 'Challenge', engagementDelta: 28, timestamp: Date.now() - 3600000 },
+    { type: 'Visual', engagementDelta: 18, timestamp: Date.now() - 7200000 },
+  ],
+  lastUpdated: Date.now(),
+};
 
-// ─── Student Profile ──────────────────────────────────────────────────────────
+const PROFILE_KEY = 'vl_student_profile';
+const FINGERPRINT_KEY = 'vl_learning_fingerprint';
+const OFFLINE_QUEUE_KEY = 'vl_offline_sync_queue';
 
 export function getStoredProfile(): StudentProfile {
   if (typeof window === 'undefined') return DEFAULT_PROFILE;
@@ -35,17 +47,6 @@ export function saveStoredProfile(profile: StudentProfile): void {
   }
 }
 
-// ─── Learning Fingerprint ─────────────────────────────────────────────────────
-
-export const DEFAULT_FINGERPRINT: LearningFingerprint = {
-  bestActivities: ['Challenge', 'Visual'],
-  preferredSessionMinutes: 10,
-  difficultyTrajectory: 'Medium→Hard',
-  bestRecoveryStrategy: 'Real-world problems',
-  engagementHistory: [],
-  lastUpdated: Date.now(),
-};
-
 export function getFingerprint(): LearningFingerprint {
   if (typeof window === 'undefined') return DEFAULT_FINGERPRINT;
   try {
@@ -65,11 +66,6 @@ export function saveFingerprint(fp: LearningFingerprint): void {
   }
 }
 
-import type { ActivityType, ActivityEngagement } from './types';
-
-/**
- * Record an engagement delta for an activity type and recompute the fingerprint.
- */
 export function updateFingerprint(
   fp: LearningFingerprint,
   activityType: ActivityType,
@@ -81,38 +77,33 @@ export function updateFingerprint(
     timestamp: Date.now(),
   };
 
-  const history = [...fp.engagementHistory, entry].slice(-50); // keep last 50
+  const history = [...fp.engagementHistory, entry].slice(-50);
 
-  // Average delta per activity type
-  const averages: Record<string, number> = {};
-  for (const e of history) {
-    if (!averages[e.type]) averages[e.type] = 0;
-    averages[e.type] += e.engagementDelta;
-  }
+  const sums: Record<string, number> = {};
   const counts: Record<string, number> = {};
-  for (const e of history) counts[e.type] = (counts[e.type] || 0) + 1;
-  const activityTypes = Object.keys(averages) as ActivityType[];
-  activityTypes.sort((a, b) => averages[b] / counts[b] - averages[a] / counts[a]);
 
-  // Difficulty trajectory from recent deltas
-  const recent = history.slice(-10);
-  const avgDelta = recent.reduce((s, e) => s + e.engagementDelta, 0) / (recent.length || 1);
-  let difficultyTrajectory = fp.difficultyTrajectory;
-  if (avgDelta > 15) difficultyTrajectory = 'Medium→Hard';
-  else if (avgDelta > 5) difficultyTrajectory = 'Easy→Medium';
-  else if (avgDelta < -5) difficultyTrajectory = 'Easy';
+  for (const e of history) {
+    sums[e.type] = (sums[e.type] || 0) + e.engagementDelta;
+    counts[e.type] = (counts[e.type] || 0) + 1;
+  }
 
-  // Best recovery: activity with highest delta among last 5 negative ones
-  const negatives = history.filter(e => e.engagementDelta < 0).slice(-5);
-  const recoveryType = negatives.length > 0
-    ? negatives.sort((a, b) => b.engagementDelta - a.engagementDelta)[0].type
-    : fp.bestRecoveryStrategy;
+  const sortedActivities = (Object.keys(sums) as ActivityType[]).sort(
+    (a, b) => sums[b] / counts[b] - sums[a] / counts[a]
+  );
+
+  const recent = history.slice(-8);
+  const avgDelta = recent.reduce((sum, item) => sum + item.engagementDelta, 0) / (recent.length || 1);
+
+  let trajectory: LearningFingerprint['difficultyTrajectory'] = fp.difficultyTrajectory;
+  if (avgDelta > 15) trajectory = 'Medium→Hard';
+  else if (avgDelta > 5) trajectory = 'Easy→Medium';
+  else if (avgDelta < -5) trajectory = 'Easy';
 
   const updated: LearningFingerprint = {
-    bestActivities: activityTypes.slice(0, 3),
+    bestActivities: sortedActivities.slice(0, 3),
     preferredSessionMinutes: fp.preferredSessionMinutes,
-    difficultyTrajectory,
-    bestRecoveryStrategy: recoveryType || 'Real-world problems',
+    difficultyTrajectory: trajectory,
+    bestRecoveryStrategy: 'Interactive Code Playground',
     engagementHistory: history,
     lastUpdated: Date.now(),
   };
@@ -121,16 +112,14 @@ export function updateFingerprint(
   return updated;
 }
 
-// ─── Offline Queue ─────────────────────────────────────────────────────────────
-
-export interface OfflineQueueItem {
+export interface OfflineAction {
   id: string;
-  payload: Record<string, unknown>;
-  createdAt: number;
-  synced: boolean;
+  type: string;
+  title: string;
+  timestamp: number;
 }
 
-export function getOfflineQueue(): OfflineQueueItem[] {
+export function getOfflineQueue(): OfflineAction[] {
   if (typeof window === 'undefined') return [];
   try {
     const item = localStorage.getItem(OFFLINE_QUEUE_KEY);
@@ -140,18 +129,18 @@ export function getOfflineQueue(): OfflineQueueItem[] {
   }
 }
 
-export function enqueueOffline(payload: Record<string, unknown>): void {
+export function enqueueOfflineAction(action: OfflineAction): void {
   if (typeof window === 'undefined') return;
-  const queue = getOfflineQueue();
-  queue.push({ id: Date.now().toString(), payload, createdAt: Date.now(), synced: false });
+  const list = getOfflineQueue();
+  list.push(action);
   try {
-    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(list));
   } catch (e) {
     console.error('Failed to enqueue offline item', e);
   }
 }
 
-export function markQueueSynced(): void {
+export function clearOfflineQueue(): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify([]));
