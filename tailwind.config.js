@@ -2,30 +2,34 @@
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        cerebro: {
-          bg: '#0D0814',
-          card: '#181126',
-          cardLight: '#241B38',
-          cardBorder: '#342552',
-          accent: '#FF4B72',
-          accentGlow: 'rgba(255, 75, 114, 0.35)',
-          purple: '#9B51E0',
-          pink: '#E53E7B',
-          orange: '#FF7A45',
-          textMuted: '#9E92B3',
+        celestial: {
+          bg: '#050308',
+          deep: '#0B0612',
+          surface: '#120A1D',
+          card: '#180E26',
+          border: 'rgba(236, 178, 146, 0.2)',
+          borderGlow: 'rgba(247, 197, 159, 0.45)',
+          gold: '#ECC09B',
+          goldLight: '#FCE6D2',
+          roseGold: '#D89079',
+          amberGlow: '#F59E0B',
+          starWhite: '#FFF8F0',
         }
       },
       boxShadow: {
-        'glow-pink': '0 0 25px -5px rgba(255, 75, 114, 0.4)',
-        'glow-purple': '0 0 30px -5px rgba(155, 81, 224, 0.3)',
-        'glow-card': '0 10px 30px -10px rgba(13, 8, 20, 0.8)',
+        'glow-celestial': '0 0 30px -4px rgba(236, 178, 146, 0.35)',
+        'glow-moon': '0 0 40px 2px rgba(252, 230, 210, 0.4)',
+        'glow-card': '0 10px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px -5px rgba(236, 178, 146, 0.15)',
+      },
+      animation: {
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'spin-very-slow': 'spin 90s linear infinite',
       }
     },
   },
